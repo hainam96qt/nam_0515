@@ -2,7 +2,8 @@
 INSERT INTO users (
     name,
     email,
-    password
+    password,
+    address
 ) VALUES (
-    $1, $2, $3
+    $1, $2, $3, $4
 ) RETURNING *;

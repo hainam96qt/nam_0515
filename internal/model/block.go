@@ -32,7 +32,6 @@ func createBlock(prevBlock *Block, data []byte, validator string) *Block {
 		Data:      data,
 		PrevHash:  prevBlock.Hash,
 		Validator: validator,
-		Hash:      "",
 	}
 	block.Hash = calculateHash(block)
 	return block

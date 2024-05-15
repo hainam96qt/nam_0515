@@ -1,13 +1,15 @@
 package model
 
-import "sync"
+import (
+	"sync"
+)
 
 type Blockchain struct {
 	Blocks       []*Block
 	mux          sync.Mutex
-	Validators   []*Validator            // danh sach cac validator
-	Accounts     map[string]*Account     // Map địa chỉ người dùng với tài khoản
-	Transactions map[string]*Transaction // Mỗi người gửi và người nhận đều được ghi lại transaction đễ truy vấn
+	Validators   []*Validator              // danh sach cac validator
+	Accounts     map[string]*Account       // Map địa chỉ người dùng với tài khoản
+	Transactions map[string][]*Transaction // Mỗi người gửi và người nhận đều được ghi lại transaction đễ truy vấn
 }
 
 func (bc *Blockchain) AddBlock(data []byte, validator string) {
@@ -28,12 +30,15 @@ func NewBlockchain() *Blockchain {
 }
 
 func (bc *Blockchain) CreateAccount(address string) *Account {
+	bc.mux.Lock()
+	defer bc.mux.Unlock()
+
 	account := &Account{
 		Address: address,
 		Balance: 0,
 	}
 
-	// TODO remove. To define value transfer in internal blockchain
+	// TODO remove. To define value transfer for test in internal blockchain
 	account.Balance = 100
 
 	bc.Accounts[address] = account
@@ -45,6 +50,9 @@ func (bc *Blockchain) GetAccount(address string) *Account {
 }
 
 func (bc *Blockchain) UpdateBalance(tx *Transaction) {
+	bc.mux.Lock()
+	defer bc.mux.Unlock()
+
 	fromAccount := bc.GetAccount(tx.From)
 	toAccount := bc.GetAccount(tx.To)
 
@@ -54,4 +62,11 @@ func (bc *Blockchain) UpdateBalance(tx *Transaction) {
 	if toAccount != nil {
 		toAccount.Balance += tx.Amount
 	}
+}
+
+func (bc *Blockchain) AddTransactionToList(address string, tx *Transaction) {
+	bc.mux.Lock()
+	defer bc.mux.Unlock()
+
+	bc.Transactions[address] = append(bc.Transactions[address], tx)
 }

@@ -40,6 +40,7 @@ func (a *Authentication) ValidateRoleUser(next http.Handler) http.Handler {
 
 		// Token is valid, pass the claims to the context for later use
 		ctx := context.WithValue(r.Context(), "UserID", claims.UserID)
+		ctx = context.WithValue(ctx, "Address", claims.Address)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

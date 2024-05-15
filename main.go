@@ -83,18 +83,15 @@ func initHTTPServer(ctx context.Context, conf *configs.Config) (httpServer *http
 
 	// repository
 	userRepo := user.NewPostgresRepository(dbConn)
-	accountRepo := blockchain.NewPostgresRepository(nil, nil, nil)
-	transactionRepo := transaction.NewPostgresRepository(dbConn)
+	blockchainRepo := blockchain.NewBlockChainRepository(nil, nil, nil)
 
 	// service
-	userService := user2.NewUserService(dbConn, userRepo)
-	accountService := account2.NewAccountService(dbConn, accountRepo)
-	transactionService := transaction2.NewTransactionService(dbConn, transactionRepo, accountRepo)
+	userService := user2.NewUserService(dbConn, userRepo, blockchainRepo)
+	transactionService := transaction2.NewTransactionService(blockchainRepo)
 	authService := authentication.NewAuthenticationService(dbConn, conf.Server.Token, userRepo)
 
 	// handler
 	user3.InitUserHandler(r, userService)
-	account3.InitAccountHandler(r, accountService)
 	transaction3.InitTransactionHandler(r, transactionService)
 	authentication2.InitAuthenticationHandler(r, authService)
 

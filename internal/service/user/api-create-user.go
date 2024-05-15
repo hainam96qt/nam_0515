@@ -23,6 +23,8 @@ func (s *Service) CreateUser(ctx context.Context, req *model.CreateUserRequest) 
 		return nil, err
 	}
 
+	s.blockChainRepo.CreateAccount(req.Address)
+
 	return &model.CreateUserResponse{
 		ID:    u.ID,
 		Token: "123456", // TODO

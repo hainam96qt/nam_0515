@@ -1,9 +1,10 @@
 package model
 
 type CreateTransactionRequest struct {
-	From   string `json:"from"`   // accountID nguoi gui
-	To     string `json:"to"`     // account id nguoi nhan
-	Amount int    `json:"amount"` // so tien
+	To            string        `json:"to"`     // account id nguoi nhan
+	Amount        int           `json:"amount"` // so tien
+	PublicKeyJSON PublicKeyJSON `json:"public_key_json"`
+	Signature     string        `json:"signature"`
 }
 
 type Transaction struct {
@@ -14,5 +15,23 @@ type Transaction struct {
 }
 
 type ListTransactionResponse struct {
-	ListTransactions []Transaction
+	Transactions []*Transaction
+}
+
+type PublicKeyJSON struct {
+	X string `json:"x"`
+	Y string `json:"y"`
+}
+
+type DataForSign struct {
+	To     string `json:"to"`     // account id nguoi nhan
+	Amount int    `json:"amount"` // so tien
+}
+
+type CreateTransactionValidateRequest struct {
+	From          string        `json:"from"`
+	To            string        `json:"to"`     // account id nguoi nhan
+	Amount        int           `json:"amount"` // so tien
+	PublicKeyJSON PublicKeyJSON `json:"public_key_json"`
+	Signature     string        `json:"signature"`
 }
