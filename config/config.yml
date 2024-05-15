@@ -1,0 +1,29 @@
+server:
+  address: ":8000"
+  readTimeout: "30s"
+  writeTimeout: "30s"
+  shutdownTimeout: "10s"
+  cors:
+    allowOrigins:
+      - "http://*"
+      - "https://*"
+    allowMethods: [ "OPTIONS", "HEAD", "POST", "GET", "PATCH", "DELETE" ]
+    allowHeaders:
+      - Content-Type
+      - Accept
+      - Accept-Language
+      - Authorization
+      - X-Request-Id
+  responseLogLimitByte: 10000
+  uploadSizeLimitByte: 5242880
+  token:
+    jwtSecretKey: "abc123"
+    timeToExpired: "6000s"
+
+postgres:
+  host: postgres-db
+  port: 5432
+  database: namdb
+  user: user
+  password: password
+
