@@ -9,7 +9,7 @@ type SmartContractConfig struct {
 	Host            string `yaml:"host"`
 	ContractAddress string `yaml:"contractAddress"`
 	PrivateKey      string `yaml:"privateKey"`
-	ChainID         string `yaml:"chainID"`
+	ChainID         int    `yaml:"chainID"`
 }
 
 func ConnectSmartContract(args SmartContractConfig) (*ethclient.Client, error) {

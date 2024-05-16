@@ -7,7 +7,6 @@ import (
 type Blockchain struct {
 	Blocks       []*Block
 	mux          sync.Mutex
-	Validators   []*Validator              // danh sach cac validator
 	Accounts     map[string]*Account       // Map địa chỉ người dùng với tài khoản
 	Transactions map[string][]*Transaction // Mỗi người gửi và người nhận đều được ghi lại transaction đễ truy vấn
 }
@@ -26,7 +25,12 @@ func (bc *Blockchain) AddBlock(data []byte, validator string) {
 func NewBlockchain() *Blockchain {
 	genesisBlock := createGenesisBlock()
 	genesisBlock.Hash = calculateHash(genesisBlock)
-	return &Blockchain{Blocks: []*Block{genesisBlock}}
+	return &Blockchain{
+		Blocks:       []*Block{genesisBlock},
+		mux:          sync.Mutex{},
+		Accounts:     make(map[string]*Account),
+		Transactions: make(map[string][]*Transaction),
+	}
 }
 
 func (bc *Blockchain) CreateAccount(address string) *Account {
@@ -67,6 +71,8 @@ func (bc *Blockchain) UpdateBalance(tx *Transaction) {
 func (bc *Blockchain) AddTransactionToList(address string, tx *Transaction) {
 	bc.mux.Lock()
 	defer bc.mux.Unlock()
-
+	if bc.Transactions[address] == nil {
+		bc.Transactions[address] = []*Transaction{}
+	}
 	bc.Transactions[address] = append(bc.Transactions[address], tx)
 }

@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"math/big"
 	"nam_0515/internal/model"
+	error2 "nam_0515/pkg/error"
 	"net/http"
 )
 
@@ -59,13 +60,14 @@ func (r *Repository) CreateTransaction(ctx context.Context, req *model.Transacti
 	}
 	var validatorStr string
 	if len(r.PoS.Validators) == 0 {
-		err := r.Validate(ctx, &validateRequest)
-		if err != nil {
-			return nil, err
-		}
+		// TODO this is for test. open later
+		//err := r.Validate(ctx, &validateRequest)
+		//if err != nil {
+		//	return nil, err
+		//}
 	} else {
 		validator := r.PoS.SelectValidator()
-		err := sendHTTPRequestToValidator(validator.Peer, req)
+		err := sendHTTPRequestToValidator(validator.Peer, validateRequest)
 		if err != nil {
 			return nil, err
 		}
@@ -88,13 +90,17 @@ func (r *Repository) CreateTransaction(ctx context.Context, req *model.Transacti
 	go r.broadcastBlock(jsonData)
 
 	r.Blockchain.UpdateBalance(req)
-	err = r.PoS.AddStake(r.Blockchain, &model.NewStakeRequest{
-		Address: validatorStr,
-		Amount:  1, // pay for validator
-	})
-	if err != nil {
-		// TODO something here
+
+	if validatorStr != "" {
+		err = r.PoS.AddStake(r.Blockchain, &model.NewStakeRequest{
+			Address: validatorStr,
+			Amount:  1, // pay for validator
+		})
+		if err != nil {
+			// TODO something here
+		}
 	}
+
 	return req, nil
 }
 
@@ -134,8 +140,12 @@ func sendHTTPRequestToValidator(validatorPeer string, requestData interface{}) e
 }
 
 func (r *Repository) Validate(ctx context.Context, req *model.CreateTransactionValidateRequest) error {
+	if r.Blockchain.Accounts[req.From] == nil {
+		return error2.NewXError("account not found", http.StatusBadRequest)
+	}
+
 	if r.Blockchain.Accounts[req.From].Balance < req.Amount {
-		return errors.New("balance not enough")
+		return error2.NewXError("balance not enough", http.StatusBadRequest)
 	}
 
 	b, err := json.Marshal(&model.DataForSign{
@@ -151,7 +161,7 @@ func (r *Repository) Validate(ctx context.Context, req *model.CreateTransactionV
 		return err
 	}
 
-	// xac thuc chu ki
+	// TODO open xac thuc chu ki
 	if !verifySignature(publicKey, b, req.Signature) {
 		return errors.New("fail to validate transaction")
 	}

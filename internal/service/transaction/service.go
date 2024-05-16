@@ -32,8 +32,10 @@ func (s *Service) CreateTransaction(ctx context.Context, req *model.CreateTransa
 	}, req.PublicKeyJSON, req.Signature)
 }
 
-func (s *Service) ListTransactions(ctx context.Context, address string) (*model.ListTransactionResponse, error) {
-	transactions, err := s.blockChainRepo.ListTransactions(ctx, address)
+func (s *Service) ListTransactions(ctx context.Context) (*model.ListTransactionResponse, error) {
+	addressCtx := ctx.Value("Address").(string)
+
+	transactions, err := s.blockChainRepo.ListTransactions(ctx, addressCtx)
 	if err != nil {
 		return nil, err
 	}
