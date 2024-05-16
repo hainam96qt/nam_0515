@@ -1,6 +1,7 @@
 package configs
 
 import (
+	"nam_0515/pkg/smartcontract"
 	"os"
 	"time"
 
@@ -10,8 +11,9 @@ import (
 )
 
 type Config struct {
-	Postgres postgres.DatabaseConfig `yaml:"postgres"`
-	Server   Server                  `yaml:"server"`
+	Postgres      postgres.DatabaseConfig           `yaml:"postgres"`
+	Server        Server                            `yaml:"server"`
+	SmartContract smartcontract.SmartContractConfig `yaml:"smartContract"`
 }
 
 type Server struct {

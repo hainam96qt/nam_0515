@@ -87,6 +87,8 @@ func (r *Repository) CreateTransaction(ctx context.Context, req *model.Transacti
 	r.Blockchain.AddTransactionToList(req.From, req)
 	r.Blockchain.AddTransactionToList(req.To, req)
 
+	req.BlockHash = r.Blockchain.Blocks[req.BlockIndex].Hash
+
 	go r.broadcastBlock(jsonData)
 
 	r.Blockchain.UpdateBalance(req)

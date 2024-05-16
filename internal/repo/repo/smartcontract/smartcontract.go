@@ -14,6 +14,7 @@ import (
 	contracts "nam_0515/internal/repo/smartcontract"
 	"nam_0515/pkg/smartcontract"
 	"strings"
+	"time"
 )
 
 type Repository struct {
@@ -26,6 +27,32 @@ func NewSmartContractRepository(ethClient *ethclient.Client, config smartcontrac
 		ethClient: ethClient,
 		config:    config,
 	}
+}
+
+func (r *Repository) AddHashToPublicBlockchain(ctx context.Context, hashStr string) error {
+	contractAddress := common.HexToAddress(r.config.ContractAddress)
+
+	contract, err := contracts.NewContracts(contractAddress, r.ethClient)
+	if err != nil {
+		return err
+	}
+
+	privateKey, err := crypto.HexToECDSA(r.config.PrivateKey)
+	if err != nil {
+		return err
+	}
+
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKey, big.NewInt(1337))
+	if err != nil {
+		return err
+	}
+
+	_, err = contract.AddString(auth, hashStr, big.NewInt(time.Now().Unix()))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *Repository) ListenEvent(contractAddress common.Address) error {

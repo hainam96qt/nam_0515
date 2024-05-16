@@ -9,12 +9,14 @@ import (
 	transaction3 "nam_0515/internal/endpoint/transaction"
 	user3 "nam_0515/internal/endpoint/user"
 	"nam_0515/internal/repo/repo/blockchain"
+	"nam_0515/internal/repo/repo/smartcontract"
 	"nam_0515/internal/repo/repo/user"
 	"nam_0515/internal/service/authentication"
 	transaction2 "nam_0515/internal/service/transaction"
 	user2 "nam_0515/internal/service/user"
 	configs "nam_0515/pkg/config"
 	"nam_0515/pkg/midleware"
+	smartcontract2 "nam_0515/pkg/smartcontract"
 	"net/http"
 	"os"
 	"os/signal"
@@ -79,15 +81,22 @@ func initHTTPServer(ctx context.Context, conf *configs.Config) (httpServer *http
 		return
 	}
 
+	smartContractConn, err := smartcontract2.ConnectSmartContract(conf.SmartContract)
+	if err != nil {
+		log.Panicf("failed to connect ethereum:: %s \n", err)
+		return
+	}
+
 	midleware.Auth.Cfg = conf.Server.Token
 
 	// repository
 	userRepo := user.NewPostgresRepository(dbConn)
 	blockchainRepo := blockchain.NewBlockChainRepository(nil, nil, nil)
+	smartContractRepo := smartcontract.NewSmartContractRepository(smartContractConn, conf.SmartContract)
 
 	// service
 	userService := user2.NewUserService(dbConn, userRepo, blockchainRepo)
-	transactionService := transaction2.NewTransactionService(blockchainRepo)
+	transactionService := transaction2.NewTransactionService(blockchainRepo, smartContractRepo)
 	authService := authentication.NewAuthenticationService(dbConn, conf.Server.Token, userRepo)
 
 	// handler

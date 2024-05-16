@@ -12,6 +12,7 @@ type Transaction struct {
 	To         string `json:"to"`
 	Amount     int    `json:"amount"`
 	BlockIndex int    `json:"block_index"`
+	BlockHash  string `json:"block_hash"`
 }
 
 type ListTransactionResponse struct {
