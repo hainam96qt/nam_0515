@@ -27,3 +27,8 @@ postgres:
   user: user
   password: password
 
+smartContract:
+  host: "http://127.0.0.1:8545"
+  contractAddress: "0xC71310988e50927AfCA4e8c59333eCa46959a7ED"
+  privateKey: "e077e5186405e47b50db3544b4762690385a3f60492bca028df83c3918fdfe1d"
+  chanID: 1337

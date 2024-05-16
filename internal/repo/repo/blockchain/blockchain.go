@@ -93,7 +93,7 @@ func (r *Repository) CreateTransaction(ctx context.Context, req *model.Transacti
 		Amount:  1, // pay for validator
 	})
 	if err != nil {
-		// TODO somethign here
+		// TODO something here
 	}
 	return req, nil
 }
